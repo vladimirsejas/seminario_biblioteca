@@ -1,3 +1,4 @@
+
 """
 epidemiology_service.py
 
@@ -16,100 +17,51 @@ import pandas as pd
 import pysus
 
 
-# ---------------------------------------------------------------------------
-# Catálogo de doenças — metadados das principais notificações do SINAN
-# ---------------------------------------------------------------------------
-
 DOENCAS = {
-    "DENG": {"nome": "Dengue",              "emoji": "🦟", "cor": "bright_red"},
-    "CHIK": {"nome": "Chikungunya",         "emoji": "🦟", "cor": "red"},
-    "ZIKA": {"nome": "Zika",                "emoji": "🦟", "cor": "yellow"},
-    "TUBE": {"nome": "Tuberculose",         "emoji": "🫁", "cor": "orange3"},
-    "HANS": {"nome": "Hanseníase",          "emoji": "🔬", "cor": "dark_orange"},
-    "LEPT": {"nome": "Leptospirose",        "emoji": "🐀", "cor": "green"},
-    "MENI": {"nome": "Meningite",           "emoji": "🧠", "cor": "magenta"},
-    "MALA": {"nome": "Malária",             "emoji": "🌿", "cor": "cyan"},
-    "HEPA": {"nome": "Hepatites Virais",    "emoji": "🫀", "cor": "blue"},
-    "CHAG": {"nome": "Doença de Chagas",    "emoji": "🪲", "cor": "purple4"},
+    "DENG": {"nome": "Dengue",              "cor": "bright_red"},
+    "CHIK": {"nome": "Chikungunya",         "cor": "red"},
+    "ZIKA": {"nome": "Zika",                "cor": "yellow"},
+    "TUBE": {"nome": "Tuberculose",         "cor": "orange3"},
+    "HANS": {"nome": "Hanseniase",          "cor": "dark_orange"},
+    "LEPT": {"nome": "Leptospirose",        "cor": "green"},
+    "MENI": {"nome": "Meningite",           "cor": "magenta"},
+    "MALA": {"nome": "Malaria",             "cor": "cyan"},
+    "HEPA": {"nome": "Hepatites Virais",    "cor": "blue"},
+    "CHAG": {"nome": "Doenca de Chagas",    "cor": "purple4"},
 }
 
 ESTADOS = {
-    "AC": "Acre",           "AL": "Alagoas",        "AP": "Amapá",
-    "AM": "Amazonas",       "BA": "Bahia",          "CE": "Ceará",
-    "DF": "Distrito Federal","ES": "Espírito Santo", "GO": "Goiás",
-    "MA": "Maranhão",       "MT": "Mato Grosso",    "MS": "Mato Grosso do Sul",
-    "MG": "Minas Gerais",   "PA": "Pará",           "PB": "Paraíba",
-    "PR": "Paraná",         "PE": "Pernambuco",     "PI": "Piauí",
+    "AC": "Acre",           "AL": "Alagoas",        "AP": "Amapa",
+    "AM": "Amazonas",       "BA": "Bahia",          "CE": "Ceara",
+    "DF": "Distrito Federal","ES": "Espirito Santo", "GO": "Goias",
+    "MA": "Maranhao",       "MT": "Mato Grosso",    "MS": "Mato Grosso do Sul",
+    "MG": "Minas Gerais",   "PA": "Para",           "PB": "Paraiba",
+    "PR": "Parana",         "PE": "Pernambuco",     "PI": "Piaui",
     "RJ": "Rio de Janeiro", "RN": "Rio Grande do Norte", "RS": "Rio Grande do Sul",
-    "RO": "Rondônia",       "RR": "Roraima",        "SC": "Santa Catarina",
-    "SP": "São Paulo",      "SE": "Sergipe",        "TO": "Tocantins",
+    "RO": "Rondonia",       "RR": "Roraima",        "SC": "Santa Catarina",
+    "SP": "Sao Paulo",      "SE": "Sergipe",        "TO": "Tocantins",
 }
 
 
 class EpidemiologyService:
-    """
-    Serviço de acesso aos dados públicos de saúde via PySUS.
 
-    Encapsula as três bases principais:
-      - SINAN: agravos e doenças de notificação compulsória
-      - SIH:   internações hospitalares
-      - SIM:   mortalidade
-    """
-
-    def get_disease_data(self, disease_code: str, year: int) -> pd.DataFrame:
-        """
-        Busca registros do SINAN para uma doença e ano via PySUS.
-
-        Chamada real (requer conexão com o servidor PySUS):
-            return pysus.sinan(disease_code, year)
-
-        Retorna DataFrame com colunas reais do SINAN:
-            SG_UF_NOT, NU_ANO, ID_AGRAVO, NU_IDADE_N, CS_SEXO, EVOLUCAO
-        """
-        # return pysus.sinan(disease_code, year)   # ← linha real de produção
+    def get_disease_data(self, disease_code, year):
+        # return pysus.sinan(disease_code, year)
         return self._simulate_sinan(disease_code, year)
 
-    def get_hospitalizations(self, state: str, year: int, month: int) -> pd.DataFrame:
-        """
-        Busca dados de internações hospitalares via PySUS (SIH).
-
-        Chamada real:
-            return pysus.sih(state, year, month)
-
-        Retorna DataFrame com colunas reais do SIH:
-            UF_ZI, ANO_CMPT, MES_CMPT, DIAG_PRINC, IDADE, SEXO, VAL_TOT, DIAS_PERM
-        """
-        # return pysus.sih(state, year, month)   # ← linha real de produção
+    def get_hospitalizations(self, state, year, month):
+        # return pysus.sih(state, year, month)
         return self._simulate_sih(state, year, month)
 
-    def get_mortality(self, state: str, year: int) -> pd.DataFrame:
-        """
-        Busca dados de mortalidade via PySUS (SIM).
-
-        Chamada real:
-            return pysus.sim(state, year)
-
-        Retorna DataFrame com colunas reais do SIM:
-            CODMUNRES, CAUSABAS, IDADE, SEXO, DTOBITO
-        """
-        # return pysus.sim(state, year)   # ← linha real de produção
+    def get_mortality(self, state, year):
+        # return pysus.sim(state, year)
         return self._simulate_sim(state, year)
 
-    def list_available_diseases(self) -> list[str]:
-        """
-        Retorna todos os códigos de doença disponíveis no SINAN via PySUS.
-
-        Os códigos são extraídos diretamente da assinatura tipada de
-        pysus.sinan(), garantindo sincronia com a biblioteca instalada.
-        """
+    def list_available_diseases(self):
         annotation = inspect.signature(pysus.sinan).parameters["disease"].annotation
         return list(get_args(annotation))
 
-    # -----------------------------------------------------------------------
-    # Simuladores — mesma estrutura de colunas do dado real
-    # -----------------------------------------------------------------------
-
-    def _simulate_sinan(self, disease_code: str, year: int) -> pd.DataFrame:
+    def _simulate_sinan(self, disease_code, year):
         random.seed(disease_code + str(year))
         n = random.randint(800, 5000)
         states = list(ESTADOS.keys())
@@ -122,7 +74,7 @@ class EpidemiologyService:
             "EVOLUCAO":   [random.choice([1, 2, 9]) for _ in range(n)],
         })
 
-    def _simulate_sih(self, state: str, year: int, month: int) -> pd.DataFrame:
+    def _simulate_sih(self, state, year, month):
         random.seed(state + str(year) + str(month))
         n = random.randint(200, 3000)
         cids = ["A90", "A15", "B50", "J18", "I21", "G03", "K35"]
@@ -137,7 +89,7 @@ class EpidemiologyService:
             "DIAS_PERM":  [random.randint(1, 30) for _ in range(n)],
         })
 
-    def _simulate_sim(self, state: str, year: int) -> pd.DataFrame:
+    def _simulate_sim(self, state, year):
         random.seed(state + "SIM" + str(year))
         n = random.randint(100, 2000)
         causas = ["A90", "A15", "C34", "I21", "J18", "N18", "E11"]
