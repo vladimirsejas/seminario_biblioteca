@@ -1,4 +1,6 @@
 venv/
 .venv/
 __pycache__/
-*.pyc
+*.pycvenv_gestos/
+modelos/
+backup_pacotes.txt
