@@ -9,6 +9,7 @@ Tres cenas, todas feitas de pontos de luz:
        1 Sobre PySUS | 2 Comparacao por Doenca | 3 Evolucao Temporal
        4 Distribuicao Geografica | 5 Internacoes (SIH) | 6 Mortalidade (SIM)
        7 Pegar doenca no ar | 0 Encerrar (frase final)
+     Acenar "tchau" com a mao aberta tambem leva a tela final, que tem o botao SAIR.
      Os numeros sao os mesmos que o terminal mostra (simulados, ilustrativos): ver dados.py.
 
 Teclas:  ESPACO avanca / volta ao menu | 1-7 e 0 abrem as telas | BACKSPACE menu
@@ -41,8 +42,11 @@ PORTA_TRAVA = 49731      # impede abrir duas copias (elas disputariam a camera)
 FONTE = cv2.FONT_HERSHEY_SIMPLEX
 TEMPO_MIRA = 1.1         # segundos com o dedo parado sobre um botao para escolher
 ANO, MES = 2026, 6       # ano/mes mostrados nas telas de dados (como no terminal)
-FRASE_FINAL = ["OBRIGADO!"]          # troque pela sua frase (uma linha por item, sem acentos)
+FRASE_FINAL = ["OBRIGADO!", "TCHAU!"]   # troque pela sua frase (uma linha por item, sem acentos)
 SUBTITULO_FINAL = "Do terminal ao show"
+ACENO_DISTANCIA = 100    # pixels que a mao precisa ir para cada lado no aceno de tchau
+ACENO_VIRADAS = 3        # trocas de direcao (direita-esquerda-direita-esquerda = 3)
+ACENO_JANELA = 1.6       # segundos em que o aceno precisa acontecer
 
 NOME_MODELO = "hand_landmarker.task"
 URL_MODELO = (
@@ -121,6 +125,8 @@ class Controle:
         self._votos_punho = deque(maxlen=5)           # votacao: evita tremedeira nos gestos
         self._votos_pinca = deque(maxlen=5)
         self._visto_em = -10.0
+        self.aceno = False                            # acabou de acenar "tchau" (so neste quadro)
+        self._trilha_aceno = deque()                  # (tempo, x da palma) com a mao aberta
 
     def atualizar_mao(self, marcas, agora):
         if marcas is None:
@@ -128,12 +134,15 @@ class Controle:
                 self.presente = False
                 self.pontos = []
             self.clique = False
+            self.aceno = False
+            self._trilha_aceno.clear()
             return
         self._visto_em = agora
         self.presente = True
         self.pontos = [para_tela(m) for m in marcas]
 
         palma = np.mean([self.pontos[i] for i in (0, 5, 9, 13, 17)], axis=0)
+        self.aceno = self._acenou(dedos_abertos(marcas) == 4, palma[0], agora)
         self.x += (palma[0] - self.x) * 0.6
         self.y += (palma[1] - self.y) * 0.6
 
@@ -157,12 +166,35 @@ class Controle:
         self.clique = self.pinca and not self._pinca_antes
         self._pinca_antes = self.pinca
 
+    def _acenou(self, aberta, x, agora):
+        """Tchau: mao aberta indo e voltando para os lados varias vezes, em pouco tempo."""
+        if not aberta:
+            self._trilha_aceno.clear()
+            return False
+        self._trilha_aceno.append((agora, x))
+        while agora - self._trilha_aceno[0][0] > ACENO_JANELA:
+            self._trilha_aceno.popleft()
+        viradas, direcao, extremo = 0, 0, self._trilha_aceno[0][1]
+        for _, x in self._trilha_aceno:
+            if direcao == 0:
+                if abs(x - extremo) > ACENO_DISTANCIA:
+                    direcao, extremo = (1 if x > extremo else -1), x
+            elif direcao * (x - extremo) > 0:          # continua indo para o mesmo lado
+                extremo = x
+            elif abs(x - extremo) > ACENO_DISTANCIA:   # voltou o bastante: trocou de direcao
+                viradas, direcao, extremo = viradas + 1, -direcao, x
+        if viradas >= ACENO_VIRADAS:
+            self._trilha_aceno.clear()
+            return True
+        return False
+
     def atualizar_mouse(self, mouse):
         self.presente = True
         self.x = self.px = self.ix = mouse["x"]
         self.y = self.py = self.iy = mouse["y"]
         self.pinca = mouse["esquerdo"]
         self.punho = mouse["direito"]
+        self.aceno = False
         self.clique = self.pinca and not self._pinca_antes
         self._pinca_antes = self.pinca
         self.pontos = []
@@ -709,7 +741,8 @@ class TelaMenu(Tela):
     def sobrepor(self, tela, revelar):
         texto(tela, "Explorador Epidemiologico - agora por gestos", LARGURA / 2, 190, 0.65,
               escurecer((200, 200, 200), revelar), 1, "centro")
-        texto(tela, "Aponte com o dedo indicador e segure 1 segundo  |  ou faca a pinca", LARGURA / 2, 600,
+        texto(tela, "Aponte com o indicador e segure 1 segundo  |  ou faca a pinca  |  acene para dar tchau",
+              LARGURA / 2, 600,
               0.6, escurecer((170, 170, 170), revelar), 1, "centro")
 
 
@@ -1015,7 +1048,16 @@ class TelaEsferas(Tela):
 
 
 class TelaFinal(Tela):
-    legenda = "fim"
+    legenda = "aponte SAIR e segure para fechar o show"
+
+    def botoes(self):
+        return super().botoes() + [Botao("sair", 1090, 18, 1260, 66, "SAIR  X", (90, 90, 255), "voltar")]
+
+    def escolher(self, id):
+        if id == "sair":
+            self.painel.encerrar()
+        else:
+            super().escolher(id)
 
     def imagem(self):
         img = imagem_vazia()
@@ -1047,6 +1089,8 @@ class CenaPainel(Cena):
         self.mira = Mira()
         self.hover = None
         self.cursor = None
+        self.saindo = None                            # momento em que apontou SAIR
+        self.sair = False                             # o programa le isto e fecha a janela
         self.abrir(tela)
 
     @property
@@ -1062,8 +1106,20 @@ class CenaPainel(Cena):
         self.p.formar(self.tela.imagem())
         self.p.vel += RNG.normal(0, 250, (self.p.n, 2))      # uma sacudida antes de se arrumarem
 
+    def encerrar(self):
+        """SAIR: os pontos explodem e, um instante depois, a janela fecha."""
+        self.saindo = self.t
+        self.p.explodir(np.array([LARGURA / 2, ALTURA / 2]), forca=1100)
+
     def atualizar(self, controle, dt):
         self.t += dt
+        if self.saindo is not None:
+            self.p.flutuar(atrito=0.6, dt=dt)
+            self.sair = self.t - self.saindo > 1.3
+            return
+        if controle.aceno and self.nome not in ("final", "esferas"):   # nas esferas a mao aberta solta
+            self.abrir("final")
+            return
         self.p.mover_para(self.p.casa, rigidez=40, atrito=7.5, dt=dt)
         self.p.mudar_cores(dt)
         self.cursor = (controle.ix, controle.iy) if controle.presente else None
@@ -1079,6 +1135,8 @@ class CenaPainel(Cena):
         self.tela.desenhar(camada)
 
     def sobrepor(self, tela):
+        if self.saindo is not None:
+            return
         tela_atual = self.tela
         tela_atual.sobrepor(tela, min(1.0, self.t / 0.8))
         desenhar_botoes(tela, tela_atual.botoes(), self.hover, self.mira.progresso)
@@ -1292,6 +1350,8 @@ def main():
             camada = np.zeros((ALTURA, LARGURA, 3), np.uint8)
             palco.desenhar(camada)
             desenhar_mao(camada, controle)
+            texto(camada, "PySUS", LARGURA - 18, ALTURA - 14, 0.75, (80, 255, 120), 2, "dir",
+                  cv2.FONT_HERSHEY_DUPLEX)                     # o nome da biblioteca, no cantinho
             tela = brilho(camada)
             palco.sobrepor(tela)
             escrever_legendas(tela, palco, mostrar_dicas, modo_mouse)
@@ -1300,7 +1360,7 @@ def main():
             cv2.imshow(JANELA, tela)
 
             tecla = cv2.waitKey(1) & 0xFF
-            if tecla == 27:                                    # ESC
+            if tecla == 27 or getattr(palco.cena, "sair", False):   # ESC ou o botao SAIR
                 break
             if cv2.getWindowProperty(JANELA, cv2.WND_PROP_VISIBLE) < 1:   # fechou no X
                 break

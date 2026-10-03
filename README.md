@@ -83,6 +83,7 @@ com distâncias entre esses pontos:
 - **Punho fechado:** nenhum dos quatro dedos tem a ponta mais longe do pulso do que a junta do meio.
 - **Pinça:** a ponta do polegar fica perto da ponta do indicador, em relação ao tamanho da mão.
 - **Apontar e segurar:** a ponta do indicador fica parada sobre um botão por cerca de 1 segundo.
+- **Tchau:** a mão aberta vai e volta para os lados pelo menos três vezes em 1,6 segundo.
 
 Para evitar que a imagem "trema", cada gesto passa por uma votação entre os últimos 5
 quadros da câmera antes de valer.
@@ -91,26 +92,18 @@ quadros da câmera antes de valer.
 
 ## Como rodar (Windows)
 
-Os dois programas usam ambientes separados, porque pedem versões diferentes do `numpy`.
+Tudo por dois cliques, sem digitar comandos:
 
-**Terminal (versão 1):**
+| Atalho | O que faz |
+|---|---|
+| `Abrir Terminal PySUS.bat` | Abre o menu do terminal (versão 1) |
+| `Abrir Show PySUS.bat` | Abre o show de gestos (versão 2) |
+| `Atualizar do GitHub.bat` | Traz as novidades do GitHub para o computador |
 
-```
-py -3.12 -m venv venv
-venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-Depois, dois cliques em `abrir_terminal.bat`.
-
-**Show de gestos (versão 2):**
-
-```
-py -3.12 -m venv venv_gestos
-venv_gestos\Scripts\python.exe -m pip install -r gestos\requirements.txt
-```
-
-Depois, dois cliques em `abrir_show.bat`. Na primeira vez o show baixa o modelo da mão,
-então precisa de internet.
+Na primeira vez em um computador, cada atalho prepara o seu ambiente sozinho (`venv` para o
+terminal, `venv_gestos` para o show). Isso leva alguns minutos e precisa de internet e do
+Python 3.12. Os dois ambientes são separados porque os programas pedem versões diferentes
+do `numpy`. Na primeira vez, o show também baixa o modelo da mão.
 
 ### Roteiro do show
 
@@ -120,6 +113,8 @@ então precisa de internet.
 3. **Menu de gestos:** as mesmas opções do terminal. Aponte e segure, ou faça a pinça:
    `1` Sobre · `2` Comparação por doença · `3` Evolução temporal · `4` Distribuição geográfica ·
    `5` Internações (SIH) · `6` Mortalidade (SIM) · `7` Pegar doença no ar · `0` Encerrar
+4. **Tchau:** acene com a mão aberta (para os lados, umas duas vezes) e aparece a tela final.
+   Nela, aponte **SAIR** e segure para fechar o show.
 
 **Teclas de emergência:** `ESPAÇO` avança ou volta ao menu · `1` a `7` e `0` abrem as telas ·
 `BACKSPACE` volta ao menu · `M` troca mão/mouse · `F` tela cheia · `H` esconde as dicas ·
