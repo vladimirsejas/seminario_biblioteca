@@ -403,7 +403,7 @@ def desenhar_cursor(tela, x, y, progresso):
         cv2.ellipse(tela, centro, (22, 22), -90, 0, 360 * progresso, (255, 255, 0), 4, cv2.LINE_AA)
 
 
-BOTAO_ABRIR_MENU = Botao("menu", 1050, 18, 1262, 66, "ABRIR MENU >", (255, 255, 0), "voltar")
+BOTAO_ABRIR_MENU = Botao("menu", 960, 90, 1250, 190, "ABRIR MENU >", (255, 255, 0), "voltar")
 
 
 # ------------------------------------------------------------------ as cenas
@@ -523,7 +523,7 @@ class CenaEnxame(Cena):
     def sobrepor(self, tela):
         if self.t > 4:
             desenhar_botoes(tela, [BOTAO_ABRIR_MENU], self.hover, self.mira.progresso)
-        if self.hover and self.cursor:
+        if self.cursor and self.t > 4:                # mostra para onde o indicador aponta
             desenhar_cursor(tela, *self.cursor, self.mira.progresso)
 
 
