@@ -105,6 +105,29 @@ terminal, `venv_gestos` para o show). Isso leva alguns minutos e precisa de inte
 Python 3.12. Os dois ambientes são separados porque os programas pedem versões diferentes
 do `numpy`. Na primeira vez, o show também baixa o modelo da mão.
 
+### O que é um `.bat`
+
+Um `.bat` é **um arquivo cheio de comandos guardados**, que o Windows executa sozinho, na
+ordem, quando você dá dois cliques. A janela preta que aparece é o Windows trabalhando (o
+**cmd**, o intérprete de comandos antigo do Windows): não é preciso digitar nada nela.
+
+- O `.bat` só existe no **Windows**. No Mac e no Linux, o equivalente é um arquivo `.sh`.
+- O show em si é Python e funciona em qualquer sistema; só o atalho muda.
+- Para ver o que um `.bat` faz antes de rodar: botão direito > **Editar**.
+
+### Usando pelo VS Code
+
+Tudo pode ser feito pelo VS Code, sem abrir o cmd:
+
+1. **Abra a pasta certa:** File > Open Folder... > `C:\seminario_biblioteca`. Assim o terminal
+   do VS Code já abre nela e mostra `PS C:\seminario_biblioteca>` (o `PS` é o **PowerShell**,
+   o terminal moderno do Windows).
+2. **Abra o terminal:** menu Terminal > New Terminal.
+3. **Rode um atalho pelo terminal:** digite `.\Abrir` e aperte **Tab** até aparecer o atalho
+   desejado (o VS Code completa com `& '.\Abrir Show PySUS.bat'`), depois **Enter**.
+4. **Ou sem digitar:** botão direito no `.bat` na lista à esquerda > **Reveal in File Explorer**,
+   e dois cliques no arquivo.
+
 ### Roteiro do show
 
 1. **O terminal vira luz:** o menu antigo aparece em pontos verdes. Feche o punho e ele se desfaz.
