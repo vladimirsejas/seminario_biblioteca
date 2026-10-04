@@ -8,6 +8,35 @@ Seminário sobre a biblioteca **PySUS**, apresentado em duas versões:
 
 ---
 
+## Duas formas de ver os mesmos dados: a antiga e a nova
+
+As duas versões têm as mesmas opções de menu e usam a mesma simulação de dados. O que muda
+é **como você escolhe** e **como os dados aparecem**.
+
+| | Antiga: terminal (versão 1) | Nova: show de gestos (versão 2) |
+|---|---|---|
+| **Como escolher** | Digitar o número da opção e o código da doença ou do estado | Apontar com o indicador e segurar, ou fazer a pinça |
+| **Como os dados aparecem** | Texto, tabelas e barras de caracteres (`▮▮▮`), feitos com a biblioteca Rich | Gráficos feitos de milhares de pontos de luz que voam até o lugar |
+| **[1] Sobre PySUS** | Painel de texto com a versão e as bases | "PySUS" em pontos de luz e a lista das bases |
+| **[2] Comparação por Doença** | Uma doença por vez, num ano sorteado: resumo, sexo e estados | As 10 doenças lado a lado em barras (ano 2026); apontar uma barra abre a evolução dela |
+| **[3] Evolução Temporal** | Ano a ano (2020–2026), em texto com barras `▮` | Gráfico de linha; apontar um ano mostra os detalhes |
+| **[4] Distribuição Geográfica** | Tabela dos estados mais afetados (2026) | Mapa do Brasil em bolhas de luz, mais o ranking |
+| **[5] Internações (SIH)** | Digitar o estado; mês e ano sorteados | Botões de estados; mês fixo (06/2026) |
+| **[6] Mortalidade (SIM)** | Digitar o estado; ano sorteado | Botões de estados; ano fixo (2026) |
+| **Só na versão nova** | | Enxame da dengue, pegar doença no ar, aceno de tchau |
+
+**Os números batem quando o ano e o mês são os mesmos.** A Evolução (2020–2026) e a
+Distribuição Geográfica (2026) mostram exatamente os mesmos valores nas duas versões. Nas
+opções 2, 5 e 6, o terminal **sorteia** o ano (e o mês, no SIH) a cada consulta, enquanto
+o show usa um ano fixo. Por isso, ali, os valores só coincidem quando o terminal sorteia o
+mesmo ano e mês do show.
+
+**No cantinho da tela do show** fica o crédito das duas bibliotecas principais: **PySUS** em
+destaque, porque é o tema do seminário, e, menor, embaixo, **MediaPipe | Google**, a
+biblioteca que enxerga a mão.
+
+---
+
 ## O que é o PySUS
 
 O [PySUS](https://github.com/AlertaDengue/PySUS) é uma biblioteca Python de código aberto,
