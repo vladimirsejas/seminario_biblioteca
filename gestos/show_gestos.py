@@ -1350,8 +1350,8 @@ def main():
             camada = np.zeros((ALTURA, LARGURA, 3), np.uint8)
             palco.desenhar(camada)
             desenhar_mao(camada, controle)
-            texto(camada, "PySUS", LARGURA - 18, ALTURA - 14, 0.75, (80, 255, 120), 2, "dir",
-                  cv2.FONT_HERSHEY_DUPLEX)                     # o nome da biblioteca, no cantinho
+            texto(camada, "MediaPipe | Google", LARGURA - 18, ALTURA - 14, 0.65, (80, 255, 120), 1, "dir",
+                  cv2.FONT_HERSHEY_DUPLEX)                     # a biblioteca que enxerga a mao, no cantinho
             tela = brilho(camada)
             palco.sobrepor(tela)
             escrever_legendas(tela, palco, mostrar_dicas, modo_mouse)
